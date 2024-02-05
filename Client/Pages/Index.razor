@@ -1,7 +1,44 @@
-﻿@page "/"
+﻿@inject HttpClient httpClient
+@* @inject IStateService StateService *@
+@inject LaunchDarkly.Sdk.Client.LdClient launchDarklyClient
+@page "/"
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+@if (featureFlagA)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Feature A</th>
+                <th>Enabled</th>
+            </tr>
+        </thead>
+        <tr>
+            <td>Text 1</td>
+            <td>Text 2</td>
+        </tr>
+        <tr>
+            <td>Text 3</td>
+            <td>Text 4</td>
+        </tr>
+        <tr>
+            <td>Text 5</td>
+            <td>Text 6</td>
+        </tr>
+    </table>
+}
 
-Welcome to your new app.
+@code {
+    bool featureFlagA = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetFeatureFlag();
+    }
+    private async Task GetFeatureFlag()
+    {
+        featureFlagA = launchDarklyClient.BoolVariation("feature-A", false);
+        StateHasChanged();
+    }
+}
